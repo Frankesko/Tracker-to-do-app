@@ -106,48 +106,78 @@ const AddTopicPopup = ({ onClose, onAddTopic, topic = null }) => {
 };
 
 const TodoApp = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("daily");
-  const [todos, setTodos] = useState(() => {
-    const storedTodos = localStorage.getItem("todos");
-    return storedTodos ? JSON.parse(storedTodos) : [];
-  });
-
+  const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isRepeating, setIsRepeating] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [topics, setTopics] = useState(() => {
-    const storedTopics = localStorage.getItem("topics");
-    return storedTopics ? JSON.parse(storedTopics) : [];
-  });
+  const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (user) {
       const todosRef = ref(db, `todos/${user.uid}`);
       const topicsRef = ref(db, `topics/${user.uid}`);
 
-      onValue(todosRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setTodos(
-            Object.entries(data).map(([key, value]) => ({ ...value, id: key }))
-          );
-        } else {
-          setTodos([]);
+      const todosUnsubscribe = onValue(
+        todosRef,
+        (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            setTodos(
+              Object.entries(data).map(([key, value]) => ({
+                ...value,
+                id: key,
+              }))
+            );
+          } else {
+            setTodos([]);
+          }
+        },
+        (error) => {
+          console.error("Error fetching todos:", error);
+          setError("Error fetching todos. Please try again.");
         }
-      });
+      );
 
-      onValue(topicsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setTopics(
-            Object.entries(data).map(([key, value]) => ({ ...value, id: key }))
-          );
-        } else {
-          setTopics([]);
+      const topicsUnsubscribe = onValue(
+        topicsRef,
+        (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            setTopics(
+              Object.entries(data).map(([key, value]) => ({
+                ...value,
+                id: key,
+              }))
+            );
+          } else {
+            setTopics([]);
+          }
+        },
+        (error) => {
+          console.error("Error fetching topics:", error);
+          setError("Error fetching topics. Please try again.");
         }
-      });
+      );
+
+      return () => {
+        todosUnsubscribe();
+        topicsUnsubscribe();
+      };
     }
   }, [user]);
 

@@ -6,7 +6,6 @@ import {
 } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { db } from "./firebase";
-import "./Login.css";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
@@ -57,6 +56,7 @@ const Login = ({ onLogin }) => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           required
+          className="w-full"
         />
         <input
           type="password"
@@ -64,18 +64,27 @@ const Login = ({ onLogin }) => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
+          className="w-full"
         />
-        <button type="submit">Login</button>
+        <button type="submit" className="w-full">
+          Login
+        </button>
       </form>
       {showPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <p>Account non trovato, desideri crearlo?</p>
-            <div className="popup-buttons">
-              <button className="no-button" onClick={() => setShowPopup(false)}>
+        <div className="login-popup-overlay">
+          <div className="login-popup-content">
+            <p className="mb-4">Account non trovato, desideri crearlo?</p>
+            <div className="login-popup-buttons">
+              <button
+                className="login-no-button"
+                onClick={() => setShowPopup(false)}
+              >
                 NO
               </button>
-              <button className="yes-button" onClick={handleCreateAccount}>
+              <button
+                className="login-yes-button"
+                onClick={handleCreateAccount}
+              >
                 SI
               </button>
             </div>
