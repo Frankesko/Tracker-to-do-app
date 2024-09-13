@@ -1,28 +1,23 @@
 import React, { useState } from "react";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { db } from "./firebase";
 import './Login.css';
 
 const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPopup, setShowPopup] = useState(false);
 
   const auth = getAuth();
 
+  const completeEmail = (username) => `${username}@test.com`;
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const email = completeEmail(username);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       onLogin(userCredential.user);
     } catch (error) {
       setShowPopup(true);
@@ -31,15 +26,14 @@ const Login = ({ onLogin }) => {
 
   const handleCreateAccount = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const email = completeEmail(username);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
+      
+      // Salva l'utente nel database
       await set(ref(db, `users/${user.uid}`), {
-        email: user.email,
+        username: username,
+        email: email,
       });
 
       onLogin(user);
@@ -52,10 +46,10 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <form onSubmit={handleLogin}>
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
           required
           className="w-full"
         />
@@ -67,27 +61,15 @@ const Login = ({ onLogin }) => {
           required
           className="w-full"
         />
-        <button type="submit" className="w-full">
-          Login
-        </button>
+        <button type="submit" className="w-full">Login</button>
       </form>
       {showPopup && (
         <div className="login-popup-overlay">
           <div className="login-popup-content">
             <p className="mb-4">Account non trovato, desideri crearlo?</p>
             <div className="login-popup-buttons">
-              <button
-                className="login-no-button"
-                onClick={() => setShowPopup(false)}
-              >
-                NO
-              </button>
-              <button
-                className="login-yes-button"
-                onClick={handleCreateAccount}
-              >
-                SI
-              </button>
+              <button className="login-no-button" onClick={() => setShowPopup(false)}>NO</button>
+              <button className="login-yes-button" onClick={handleCreateAccount}>SI</button>
             </div>
           </div>
         </div>
