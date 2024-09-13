@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { db } from "./firebase";
+import Login from "./Login.css";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
