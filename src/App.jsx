@@ -17,7 +17,7 @@ import {
 import { db } from "./firebase";
 import { ref, onValue, push, update, remove } from "firebase/database";
 import "./App.css";
-import Login from "./login";
+import Login from "./login.jsx";
 
 const AddTopicPopup = ({ onClose, onAddTopic, topic = null }) => {
   const [topicTitle, setTopicTitle] = useState(topic ? topic.title : "");
