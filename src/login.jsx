@@ -75,7 +75,6 @@ const Login = ({ onLogin }) => {
         <div className="login-popup-overlay">
           <div className="login-popup-content">
             <p className="mb-4">Account non trovato, desideri crearlo?</p>
-            <p className="mb-4">L'email sarà: {completeEmail(username)}</p>
             <div className="login-popup-buttons">
               <button className="login-no-button" onClick={() => setShowPopup(false)}>NO</button>
               <button className="login-yes-button" onClick={handleCreateAccount}>SI</button>
