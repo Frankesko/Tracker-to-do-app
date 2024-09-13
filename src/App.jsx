@@ -12,11 +12,12 @@ import {
   endOfMonth,
   addDays,
   addMonths,
-  eachDayOfInterval
+  eachDayOfInterval,
 } from "date-fns";
-import { db } from './firebase';
-import { ref, onValue, push, update, remove } from 'firebase/database';
+import { db } from "./firebase";
+import { ref, onValue, push, update, remove } from "firebase/database";
 import "./App.css";
+import Login from "./Login";
 
 const AddTopicPopup = ({ onClose, onAddTopic, topic = null }) => {
   const [topicTitle, setTopicTitle] = useState(topic ? topic.title : "");
@@ -122,26 +123,36 @@ const TodoApp = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   useEffect(() => {
-    const todosRef = ref(db, 'todos');
-    const topicsRef = ref(db, 'topics');
+    if (user) {
+      const todosRef = ref(db, `todos/${user.uid}`);
+      const topicsRef = ref(db, `topics/${user.uid}`);
 
-    onValue(todosRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setTodos(Object.entries(data).map(([key, value]) => ({...value, id: key})));
-      }
-    });
+      onValue(todosRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setTodos(
+            Object.entries(data).map(([key, value]) => ({ ...value, id: key }))
+          );
+        } else {
+          setTodos([]);
+        }
+      });
 
-    onValue(topicsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setTopics(Object.entries(data).map(([key, value]) => ({...value, id: key})));
-      }
-    });
-  }, []);
+      onValue(topicsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setTopics(
+            Object.entries(data).map(([key, value]) => ({ ...value, id: key }))
+          );
+        } else {
+          setTopics([]);
+        }
+      });
+    }
+  }, [user]);
 
   const addTodo = () => {
-    if (newTodo.trim() !== "") {
+    if (newTodo.trim() !== "" && user) {
       const newTodoItem = {
         text: newTodo,
         completed: false,
@@ -149,13 +160,13 @@ const TodoApp = () => {
         repeating: isRepeating,
         repeatInterval: isRepeating ? getRepeatInterval() : null,
         type: activeTab,
+        userId: user.uid,
       };
-      push(ref(db, 'todos'), newTodoItem);
+      push(ref(db, `todos/${user.uid}`), newTodoItem);
       setNewTodo("");
       setIsRepeating(false);
     }
   };
-
 
   const getRepeatInterval = () => {
     switch (activeTab) {
@@ -171,33 +182,34 @@ const TodoApp = () => {
   };
 
   const toggleTodoCompletion = (id) => {
-    const todoRef = ref(db, `todos/${id}`);
-    update(todoRef, { 
-      completed: !todos.find(todo => todo.id === id).completed,
-      lastCompletedDate: new Date().toISOString()
+    const todoRef = ref(db, `todos/${user.uid}/${id}`);
+    update(todoRef, {
+      completed: !todos.find((todo) => todo.id === id).completed,
+      lastCompletedDate: new Date().toISOString(),
     });
   };
 
   const deleteTodo = (id) => {
-    const todoRef = ref(db, `todos/${id}`);
+    const todoRef = ref(db, `todos/${user.uid}/${id}`);
     remove(todoRef);
   };
 
   const handleAddTopic = (title, topicTodos, topicId = null) => {
     if (topicId) {
-      const topicRef = ref(db, `topics/${topicId}`);
+      const topicRef = ref(db, `topics/${user.uid}/${topicId}`);
       update(topicRef, { title, todos: topicTodos });
     } else {
       const newTopic = {
         title: title,
         todos: topicTodos,
+        userId: user.uid,
       };
-      push(ref(db, 'topics'), newTopic);
+      push(ref(db, `topics/${user.uid}`), newTopic);
     }
   };
 
   const handleDeleteTopic = (topicId) => {
-    const topicRef = ref(db, `topics/${topicId}`);
+    const topicRef = ref(db, `topics/${user.uid}/${topicId}`);
     remove(topicRef);
   };
 
@@ -274,7 +286,7 @@ const TodoApp = () => {
         );
       case "calendar":
         const changeMonth = (increment) => {
-          setSelectedDate(prevDate => addMonths(prevDate, increment));
+          setSelectedDate((prevDate) => addMonths(prevDate, increment));
         };
 
         // Calcola il primo giorno del mese e i giorni del mese precedente da mostrare
@@ -304,10 +316,7 @@ const TodoApp = () => {
                   onChange={(e) => setSelectedDate(parseISO(e.target.value))}
                   className="todo-date-input"
                 />
-                <button
-                  onClick={addTodo}
-                  className="todo-add-button"
-                >
+                <button onClick={addTodo} className="todo-add-button">
                   Add
                 </button>
               </div>
@@ -318,38 +327,43 @@ const TodoApp = () => {
                   {day}
                 </div>
               ))}
-              {eachDayOfInterval({ start: startDate, end: endDate }).map((date) => {
-                const dayTodos = todos.filter((todo) =>
-                  isSameDay(parseISO(todo.date), date)
-                );
-                const isCurrentMonth = date.getMonth() === selectedDate.getMonth();
-                return (
-                  <div
-                    key={date.toISOString()}
-                    className={`
+              {eachDayOfInterval({ start: startDate, end: endDate }).map(
+                (date) => {
+                  const dayTodos = todos.filter((todo) =>
+                    isSameDay(parseISO(todo.date), date)
+                  );
+                  const isCurrentMonth =
+                    date.getMonth() === selectedDate.getMonth();
+                  return (
+                    <div
+                      key={date.toISOString()}
+                      className={`
                       p-2 border text-left cursor-pointer overflow-hidden
                       ${isToday(date) ? "bg-yellow-100" : ""}
                       ${isWeekend(date) ? "text-red-500" : ""}
                       ${isSameDay(date, selectedDate) ? "bg-blue-100" : ""}
                       ${!isCurrentMonth ? "text-gray-400" : ""}
                     `}
-                    onClick={() => setSelectedDate(date)}
-                  >
-                    <div className="font-bold">{format(date, "d")}</div>
-                    <div className="text-xs">
-                      {dayTodos.map((todo) => (
-                        <div
-                          key={todo.id}
-                          className={`truncate ${todo.completed ? "line-through" : ""}`}
-                          title={todo.text}
-                        >
-                          {todo.text}
-                        </div>
-                      ))}
+                      onClick={() => setSelectedDate(date)}
+                    >
+                      <div className="font-bold">{format(date, "d")}</div>
+                      <div className="text-xs">
+                        {dayTodos.map((todo) => (
+                          <div
+                            key={todo.id}
+                            className={`truncate ${
+                              todo.completed ? "line-through" : ""
+                            }`}
+                            title={todo.text}
+                          >
+                            {todo.text}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
             <div className="flex justify-between items-center mb-4">
               <button
@@ -358,7 +372,9 @@ const TodoApp = () => {
               >
                 &lt;
               </button>
-              <div className="font-bold">{format(selectedDate, "MMMM yyyy")}</div>
+              <div className="font-bold">
+                {format(selectedDate, "MMMM yyyy")}
+              </div>
               <button
                 onClick={() => changeMonth(1)}
                 className="bg-gray-200 px-3 py-1 rounded"
@@ -367,10 +383,14 @@ const TodoApp = () => {
               </button>
             </div>
             <div>
-              <h3 className="font-bold mb-2">Events for {format(selectedDate, "MMMM d, yyyy")}</h3>
+              <h3 className="font-bold mb-2">
+                Events for {format(selectedDate, "MMMM d, yyyy")}
+              </h3>
               <ul>
                 {todos
-                  .filter((todo) => isSameDay(parseISO(todo.date), selectedDate))
+                  .filter((todo) =>
+                    isSameDay(parseISO(todo.date), selectedDate)
+                  )
                   .map((todo) => (
                     <li key={todo.id} className="flex items-center mb-2">
                       <input
@@ -463,6 +483,10 @@ const TodoApp = () => {
         return null;
     }
   };
+
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-md">
