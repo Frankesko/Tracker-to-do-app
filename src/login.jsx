@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import { db } from "./firebase";
+import "./Login.css";
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
@@ -37,7 +38,6 @@ const Login = ({ onLogin }) => {
       );
       const user = userCredential.user;
 
-      // Salva l'utente nel database
       await set(ref(db, `users/${user.uid}`), {
         email: user.email,
       });
