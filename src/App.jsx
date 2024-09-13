@@ -514,9 +514,20 @@ const TodoApp = () => {
     }
   };
 
+  console.log("Rendering TodoApp");
+  if (loading) {
+    console.log("Loading...");
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    console.log("Error:", error);
+    return <div>Error: {error}</div>;
+  }
   if (!user) {
+    console.log("No user, showing login");
     return <Login onLogin={setUser} />;
   }
+  console.log("User logged in, rendering content");
 
   return (
     <div className="container mx-auto p-4 max-w-md">
