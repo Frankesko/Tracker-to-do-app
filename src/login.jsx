@@ -13,13 +13,20 @@ const Login = ({ onLogin }) => {
 
   const completeEmail = (username) => `${username}@test.com`;
 
+  const ensurePasswordLength = (pass) => {
+    // Se la password è più corta di 6 caratteri, aggiungi "123456" alla fine
+    return pass.length < 6 ? pass + "123456".slice(0, 6 - pass.length) : pass;
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const email = completeEmail(username);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const securePassword = ensurePasswordLength(password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, securePassword);
       onLogin(userCredential.user);
     } catch (error) {
+      console.error("Errore di login:", error);
       setShowPopup(true);
     }
   };
@@ -27,7 +34,8 @@ const Login = ({ onLogin }) => {
   const handleCreateAccount = async () => {
     try {
       const email = completeEmail(username);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const securePassword = ensurePasswordLength(password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, securePassword);
       const user = userCredential.user;
       
       // Salva l'utente nel database
@@ -57,7 +65,7 @@ const Login = ({ onLogin }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
+          placeholder="Password (minimo 1 carattere)"
           required
           className="w-full"
         />
@@ -67,6 +75,7 @@ const Login = ({ onLogin }) => {
         <div className="login-popup-overlay">
           <div className="login-popup-content">
             <p className="mb-4">Account non trovato, desideri crearlo?</p>
+            <p className="mb-4">L'email sarà: {completeEmail(username)}</p>
             <div className="login-popup-buttons">
               <button className="login-no-button" onClick={() => setShowPopup(false)}>NO</button>
               <button className="login-yes-button" onClick={handleCreateAccount}>SI</button>
