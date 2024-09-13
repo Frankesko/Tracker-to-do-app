@@ -14,7 +14,7 @@ import {
   addMonths,
   eachDayOfInterval,
 } from "date-fns";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
 import { ref, onValue, push, update, remove } from "firebase/database";
 import "./App.css";
 import Login from "./login.jsx";
