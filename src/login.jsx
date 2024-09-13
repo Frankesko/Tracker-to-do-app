@@ -65,7 +65,7 @@ const Login = ({ onLogin }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password (minimo 1 carattere)"
+          placeholder="Password"
           required
           className="w-full"
         />
