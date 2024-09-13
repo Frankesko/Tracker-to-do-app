@@ -14,6 +14,8 @@ import {
   addMonths,
   eachDayOfInterval
 } from "date-fns";
+import { db } from './firebase';
+import { ref, onValue, push, update, remove } from 'firebase/database';
 import "./App.css";
 
 const AddTopicPopup = ({ onClose, onAddTopic, topic = null }) => {
@@ -120,29 +122,40 @@ const TodoApp = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    const todosRef = ref(db, 'todos');
+    const topicsRef = ref(db, 'topics');
 
-  useEffect(() => {
-    localStorage.setItem("topics", JSON.stringify(topics));
-  }, [topics]);
+    onValue(todosRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setTodos(Object.entries(data).map(([key, value]) => ({...value, id: key})));
+      }
+    });
+
+    onValue(topicsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setTopics(Object.entries(data).map(([key, value]) => ({...value, id: key})));
+      }
+    });
+  }, []);
 
   const addTodo = () => {
     if (newTodo.trim() !== "") {
       const newTodoItem = {
-        id: Date.now(),
         text: newTodo,
         completed: false,
-        date: format(selectedDate, "yyyy-MM-dd"), // Modifica qui
+        date: format(selectedDate, "yyyy-MM-dd"),
         repeating: isRepeating,
         repeatInterval: isRepeating ? getRepeatInterval() : null,
         type: activeTab,
       };
-      setTodos([...todos, newTodoItem]);
+      push(ref(db, 'todos'), newTodoItem);
       setNewTodo("");
       setIsRepeating(false);
     }
   };
+
 
   const getRepeatInterval = () => {
     switch (activeTab) {
@@ -158,44 +171,34 @@ const TodoApp = () => {
   };
 
   const toggleTodoCompletion = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id
-          ? {
-              ...todo,
-              completed: !todo.completed,
-              lastCompletedDate: todo.completed
-                ? null
-                : new Date().toISOString(),
-            }
-          : todo
-      )
-    );
+    const todoRef = ref(db, `todos/${id}`);
+    update(todoRef, { 
+      completed: !todos.find(todo => todo.id === id).completed,
+      lastCompletedDate: new Date().toISOString()
+    });
   };
 
   const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+    const todoRef = ref(db, `todos/${id}`);
+    remove(todoRef);
   };
 
   const handleAddTopic = (title, topicTodos, topicId = null) => {
     if (topicId) {
-      setTopics(
-        topics.map((topic) =>
-          topic.id === topicId ? { ...topic, title, todos: topicTodos } : topic
-        )
-      );
+      const topicRef = ref(db, `topics/${topicId}`);
+      update(topicRef, { title, todos: topicTodos });
     } else {
       const newTopic = {
-        id: Date.now(),
         title: title,
         todos: topicTodos,
       };
-      setTopics([...topics, newTopic]);
+      push(ref(db, 'topics'), newTopic);
     }
   };
 
   const handleDeleteTopic = (topicId) => {
-    setTopics(topics.filter((topic) => topic.id !== topicId));
+    const topicRef = ref(db, `topics/${topicId}`);
+    remove(topicRef);
   };
 
   const getVisibleTodos = () => {
