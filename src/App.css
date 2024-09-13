@@ -1,0 +1,366 @@
+/* Stili generali */
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 60px;
+}
+
+/* Stili per input e pulsanti */
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #357abd;
+}
+
+/* Stili per le liste */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+li input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+/* Modifiche per daily, weekly, monthly */
+.content > div:nth-child(2) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.content > div:nth-child(2) label {
+  flex-grow: 1;
+}
+
+.content > div:nth-child(2) button {
+  margin-left: auto;
+}
+
+.content li button {
+  margin-left: auto;
+  background-color: transparent;
+  color: #ff4d4d;
+}
+
+/* Stili aggiornati per il calendario */
+.content > div:first-child {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.content > div:first-child input[type="text"] {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.content > div:first-child > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content > div:first-child input[type="date"] {
+  flex-grow: 1;
+  margin-right: 10px;
+  margin-bottom: 0;
+}
+
+.content > div:first-child button {
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.grid > div {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  overflow: hidden;
+}
+
+.grid > div > div:first-child {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.grid > div > div:last-child {
+  font-size: 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.grid > div:nth-child(7n),
+.grid > div:nth-child(7n-1) {
+  color: #ff4d4d;
+}
+
+.grid > div.today {
+  background-color: #4caf50;
+  color: white;
+}
+
+.content > div:nth-child(4) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.content > div:nth-child(4) button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.content > div:nth-child(4) div {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.content > div:last-child h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.content > div:last-child ul {
+  margin-top: 10px;
+}
+
+.content > div:last-child li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.content > div:last-child li button {
+  background-color: transparent;
+  color: #ff4d4d;
+}
+
+/* Modifiche per la pagina Other */
+.content > button:first-child {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+.content > div.topic {
+  background-color: #e6f2ff;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.content > div.topic > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.content > div.topic > div:first-child button {
+  background-color: transparent;
+  color: #ff4d4d;
+}
+
+/* Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+}
+
+/* Modifiche per il popup dei topic */
+.popup-content > div:nth-child(3) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.popup-content > div:nth-child(3) input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.popup-content ul li button {
+  margin-left: auto;
+  background-color: transparent;
+  color: #ff4d4d;
+}
+
+.popup-content > div:last-child {
+  display: flex;
+  justify-content: space-between;
+}
+
+.popup-content > div:last-child button:first-child {
+  background-color: #ccc;
+}
+
+/* Barra di navigazione */
+.fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.fixed button {
+  background-color: transparent;
+  color: #4a90e2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Classi di utilità per il calendario */
+.bg-yellow-100 { background-color: #fef9c3; }
+.bg-blue-100 { background-color: #dbeafe; }
+.text-red-500 { color: #ef4444; }
+.text-gray-400 { color: #9ca3af; }
+
+
+/* Stili specifici per il componente Todo con maggiore specificità */
+.content .todo-input-container {
+  display: flex !important;
+  flex-direction: column !important;
+  margin-bottom: 1rem;
+}
+
+.content .todo-text-input-container {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.content .todo-text-input {
+  width: 100% !important;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-bottom: 0 !important;
+}
+
+.content .todo-date-button-container {
+  display: flex !important;
+  align-items: center;
+  width: 100%;
+}
+
+.content .todo-date-input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-right: 10px;
+  margin-bottom: 0 !important;
+}
+
+.content .todo-add-button {
+  background-color: #4a90e2;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.content .todo-add-button:hover {
+  background-color: #357abd;
+}
+
+/* Media query aggiornata */
+@media (max-width: 768px) {
+  .content .todo-date-button-container {
+    flex-direction: row !important;
+  }
+  
+  .content .todo-date-input {
+    width: auto !important;
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  
+  .content .todo-add-button {
+    width: auto !important;
+  }
+}
