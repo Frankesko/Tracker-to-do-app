@@ -1,81 +1,91 @@
 .hobby-page {
-    background-color: #242424;
-    color: rgba(255, 255, 255, 0.87);
-    padding: 1rem;
-    border-radius: 8px;
-  }
-  
-  .hobby-page h2 {
-    margin-bottom: 1rem;
-  }
-  
-  .hobby-page input[type="text"] {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    background-color: #1a1a1a;
-    color: rgba(255, 255, 255, 0.87);
-    border: 1px solid #444;
-    border-radius: 4px;
-  }
-  
-  .hobby-page button {
-    width: 100%;
-    padding: 0.5rem;
-    background-color: #646cff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.25s;
-  }
-  
-  .hobby-page button:hover {
-    background-color: #535bf2;
-  }
-  
+  padding: 1rem 0;
+}
+
+.hobby-page h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.hobby-page input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+}
+
+.hobby-page button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.25s;
+  font-size: 1rem;
+}
+
+.hobby-page button:hover {
+  background-color: #3182ce;
+}
+
+.hobby-page table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.hobby-page th,
+.hobby-page td {
+  padding: 0.5rem 0.25rem;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.hobby-page th {
+  background-color: #f7fafc;
+  font-weight: bold;
+}
+
+.hobby-page td:first-child {
+  text-align: left;
+  padding-left: 0.5rem;
+}
+
+.hobby-page input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.error-message {
+  color: #e53e3e;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
   .hobby-page table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
+    font-size: 0.75rem;
   }
-  
+
   .hobby-page th,
   .hobby-page td {
-    padding: 0.5rem;
-    border: 1px solid #444;
-    text-align: left;
+    padding: 0.25rem 0.125rem;
   }
-  
-  .hobby-page th {
-    background-color: #1a1a1a;
-    font-weight: bold;
+
+  .hobby-page td:first-child {
+    padding-left: 0.25rem;
   }
-  
+
   .hobby-page input[type="checkbox"] {
-    width: 1.2rem;
-    height: 1.2rem;
-    cursor: pointer;
+    width: 0.875rem;
+    height: 0.875rem;
   }
-  
-  @media (prefers-color-scheme: light) {
-    .hobby-page {
-      background-color: #ffffff;
-      color: #213547;
-    }
-  
-    .hobby-page input[type="text"] {
-      background-color: #f9f9f9;
-      color: #213547;
-      border-color: #ddd;
-    }
-  
-    .hobby-page th {
-      background-color: #f0f0f0;
-    }
-  
-    .hobby-page th,
-    .hobby-page td {
-      border-color: #ddd;
-    }
-  }
+}
