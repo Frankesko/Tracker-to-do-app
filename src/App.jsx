@@ -18,6 +18,97 @@ import { db, auth } from "./firebase";
 import { ref, onValue, push, update, remove } from "firebase/database";
 import "./App.css";
 import Login from "./login.jsx";
+import './HobbyPage.css';
+
+const HobbyPage = () => {
+  const [hobbies, setHobbies] = useState([]);
+  const [newHobby, setNewHobby] = useState("");
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    if (user) {
+      const hobbiesRef = ref(db, `hobbies/${user.uid}`);
+      const unsubscribe = onValue(hobbiesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setHobbies(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
+        } else {
+          setHobbies([]);
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  const addHobby = () => {
+    if (newHobby.trim() !== "" && user) {
+      const newHobbyItem = {
+        name: newHobby,
+        days: {},
+      };
+      push(ref(db, `hobbies/${user.uid}`), newHobbyItem);
+      setNewHobby("");
+    }
+  };
+
+  const toggleHobbyDay = (hobbyId, day) => {
+    const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}/days/${day}`);
+    const currentValue = hobbies.find(h => h.id === hobbyId)?.days?.[day] || false;
+    update(hobbyRef, !currentValue);
+  };
+
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  return (
+    <div className="hobby-page">
+      <h2 className="text-xl font-bold mb-4 text-center">Hobbies</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          value={newHobby}
+          onChange={(e) => setNewHobby(e.target.value)}
+          placeholder="Add a new hobby"
+          className="w-full p-2 border rounded"
+        />
+        <button
+          onClick={addHobby}
+          className="bg-blue-500 text-white px-4 py-2 rounded mt-2 w-full"
+        >
+          Add Hobby
+        </button>
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="text-left">Hobby</th>
+            {days.map(day => (
+              <th key={day} className="text-center">{day}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {hobbies.map(hobby => (
+            <tr key={hobby.id}>
+              <td>{hobby.name}</td>
+              {days.map(day => (
+                <td key={day} className="text-center">
+                  <input
+                    type="checkbox"
+                    checked={hobby.days?.[day] || false}
+                    onChange={() => toggleHobbyDay(hobby.id, day)}
+                    className="h-5 w-5"
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 
 const AddTopicPopup = ({ onClose, onAddTopic, topic = null }) => {
   const [topicTitle, setTopicTitle] = useState(topic ? topic.title : "");
@@ -109,7 +200,7 @@ const TodoApp = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("daily");
+  const [activeTab, setActiveTab] = useState("hobby");
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -249,6 +340,8 @@ const TodoApp = () => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "hobby":
+        return <HobbyPage />;
       case "daily":
       case "weekly":
       case "monthly":
@@ -533,6 +626,10 @@ const TodoApp = () => {
     <div className="container mx-auto p-4 max-w-md">
       {renderContent()}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-2">
+        <button onClick={() => setActiveTab("hobby")} className="p-2">
+          <Bookmark size={24} />
+          <div className="text-xs">Hobby</div>
+        </button>
         <button onClick={() => setActiveTab("daily")} className="p-2">
           <CalendarDays size={24} />
           <div className="text-xs">1</div>
