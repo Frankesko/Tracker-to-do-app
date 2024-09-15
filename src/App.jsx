@@ -24,18 +24,28 @@ import "./HobbyPage.css";
 const HobbyPage = () => {
   const [hobbies, setHobbies] = useState([]);
   const [newHobby, setNewHobby] = useState("");
+  const [error, setError] = useState(null);
   const user = auth.currentUser;
 
   useEffect(() => {
     if (user) {
       const hobbiesRef = ref(db, `hobbies/${user.uid}`);
       const unsubscribe = onValue(hobbiesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setHobbies(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
-        } else {
-          setHobbies([]);
+        try {
+          const data = snapshot.val();
+          if (data) {
+            setHobbies(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
+          } else {
+            setHobbies([]);
+          }
+          setError(null);
+        } catch (error) {
+          console.error("Error fetching hobbies:", error);
+          setError("Error fetching hobbies. Please check your database permissions.");
         }
+      }, (error) => {
+        console.error("Error in onValue:", error);
+        setError("Error connecting to the database. Please check your internet connection and try again.");
       });
 
       return () => unsubscribe();
@@ -63,6 +73,7 @@ const HobbyPage = () => {
 
   return (
     <div className="hobby-page">
+      {error && <div className="error-message">{error}</div>}
       <h2 className="text-xl font-bold mb-4 text-center">Hobbies</h2>
       <div className="mb-4">
         <input
