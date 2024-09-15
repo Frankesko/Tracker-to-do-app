@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Plus, CalendarDays, X, Trash2, Bookmark } from "lucide-react";
+import { Calendar, Plus, CalendarDays, X, Trash2, Bookmark, Trash2 } from "lucide-react";
 import {
   format,
   parseISO,
@@ -69,6 +69,16 @@ const HobbyPage = () => {
     update(hobbyRef, !currentValue);
   };
 
+  const deleteHobby = (hobbyId) => {
+    if (user) {
+      const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}`);
+      remove(hobbyRef).catch((error) => {
+        console.error("Error deleting hobby:", error);
+        setError("Error deleting hobby. Please try again.");
+      });
+    }
+  };
+
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
@@ -97,6 +107,7 @@ const HobbyPage = () => {
             {days.map(day => (
               <th key={day} className="text-center">{day}</th>
             ))}
+            <th className="text-center">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -113,6 +124,14 @@ const HobbyPage = () => {
                   />
                 </td>
               ))}
+              <td className="text-center">
+                <button
+                  onClick={() => deleteHobby(hobby.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
