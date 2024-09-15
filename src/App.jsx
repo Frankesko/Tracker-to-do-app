@@ -64,9 +64,22 @@ const HobbyPage = () => {
   };
 
   const toggleHobbyDay = (hobbyId, day) => {
-    const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}/days/${day}`);
+    if (!user) {
+      console.error("No user logged in");
+      setError("You must be logged in to update hobbies.");
+      return;
+    }
+  
+    const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}/days`);
     const currentValue = hobbies.find(h => h.id === hobbyId)?.days?.[day] || false;
-    update(hobbyRef, !currentValue);
+    const updates = {
+      [day]: !currentValue
+    };
+    update(hobbyRef, updates)
+      .catch((error) => {
+        console.error("Error updating hobby day:", error);
+        setError("Error updating hobby. Please try again.");
+      });
   };
 
   const deleteHobby = (hobbyId) => {
