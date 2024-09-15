@@ -127,9 +127,10 @@ const HobbyPage = () => {
               <td className="text-center">
                 <button
                   onClick={() => deleteHobby(hobby.id)}
-                  className="text-red-500 hover:text-red-700"
+                  className="delete-button"
+                  aria-label="Delete hobby"
                 >
-                  <Trash2 size={20} />
+                  <Trash2 />
                 </button>
               </td>
             </tr>
