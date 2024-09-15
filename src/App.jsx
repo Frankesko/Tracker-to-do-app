@@ -18,7 +18,7 @@ import { db, auth } from "./firebase";
 import { ref, onValue, push, update, remove } from "firebase/database";
 import "./App.css";
 import Login from "./login.jsx";
-import './HobbyPage.css';
+import "./HobbyPage.css";
 
 const HobbyPage = () => {
   const [hobbies, setHobbies] = useState([]);
