@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Plus, CalendarDays, X, Trash2, Bookmark, Trash2 } from "lucide-react";
+import { Calendar, Plus, CalendarDays, X, Trash2, Bookmark } from "lucide-react";
 import {
   format,
   parseISO,
