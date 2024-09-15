@@ -23,18 +23,27 @@ import "./HobbyPage.css";
 const HobbyPage = () => {
   const [hobbies, setHobbies] = useState([]);
   const [newHobby, setNewHobby] = useState("");
+  const [error, setError] = useState(null);
   const user = auth.currentUser;
 
   useEffect(() => {
     if (user) {
       const hobbiesRef = ref(db, `hobbies/${user.uid}`);
       const unsubscribe = onValue(hobbiesRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setHobbies(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
-        } else {
-          setHobbies([]);
+        try {
+          const data = snapshot.val();
+          if (data) {
+            setHobbies(Object.entries(data).map(([key, value]) => ({ id: key, ...value })));
+          } else {
+            setHobbies([]);
+          }
+        } catch (error) {
+          console.error("Error fetching hobbies:", error);
+          setError("Error fetching hobbies. Please try again.");
         }
+      }, (error) => {
+        console.error("Error in onValue:", error);
+        setError("Error connecting to the database. Please try again.");
       });
 
       return () => unsubscribe();
@@ -47,18 +56,38 @@ const HobbyPage = () => {
         name: newHobby,
         days: {},
       };
-      push(ref(db, `hobbies/${user.uid}`), newHobbyItem);
-      setNewHobby("");
+      push(ref(db, `hobbies/${user.uid}`), newHobbyItem)
+        .then(() => {
+          setNewHobby("");
+        })
+        .catch((error) => {
+          console.error("Error adding hobby:", error);
+          setError("Error adding hobby. Please try again.");
+        });
     }
   };
 
   const toggleHobbyDay = (hobbyId, day) => {
-    const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}/days/${day}`);
-    const currentValue = hobbies.find(h => h.id === hobbyId)?.days?.[day] || false;
-    update(hobbyRef, !currentValue);
+    if (user) {
+      const hobbyRef = ref(db, `hobbies/${user.uid}/${hobbyId}/days/${day}`);
+      const currentValue = hobbies.find(h => h.id === hobbyId)?.days?.[day] || false;
+      update(hobbyRef, !currentValue)
+        .catch((error) => {
+          console.error("Error updating hobby day:", error);
+          setError("Error updating hobby. Please try again.");
+        });
+    }
   };
 
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
+
+  if (!user) {
+    return <div>Please log in to view your hobbies.</div>;
+  }
 
   return (
     <div className="hobby-page">
@@ -78,33 +107,37 @@ const HobbyPage = () => {
           Add Hobby
         </button>
       </div>
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="text-left">Hobby</th>
-            {days.map(day => (
-              <th key={day} className="text-center">{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {hobbies.map(hobby => (
-            <tr key={hobby.id}>
-              <td>{hobby.name}</td>
+      {hobbies.length > 0 ? (
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th className="text-left">Hobby</th>
               {days.map(day => (
-                <td key={day} className="text-center">
-                  <input
-                    type="checkbox"
-                    checked={hobby.days?.[day] || false}
-                    onChange={() => toggleHobbyDay(hobby.id, day)}
-                    className="h-5 w-5"
-                  />
-                </td>
+                <th key={day} className="text-center">{day}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {hobbies.map(hobby => (
+              <tr key={hobby.id}>
+                <td>{hobby.name}</td>
+                {days.map(day => (
+                  <td key={day} className="text-center">
+                    <input
+                      type="checkbox"
+                      checked={hobby.days?.[day] || false}
+                      onChange={() => toggleHobbyDay(hobby.id, day)}
+                      className="h-5 w-5"
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No hobbies added yet. Add your first hobby above!</p>
+      )}
     </div>
   );
 };
