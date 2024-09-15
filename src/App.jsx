@@ -120,7 +120,7 @@ const HobbyPage = () => {
             {days.map(day => (
               <th key={day} className="text-center">{day}</th>
             ))}
-            <th className="text-center">Delete</th>
+            <th className="text-center">Del</th>
           </tr>
         </thead>
         <tbody>
